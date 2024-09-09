@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Google Maps with Search Bar</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAdQwjsat2j6YLEE-H4UqYgR38ecLrnGIU&libraries=places"></script>
+    <style>
+      /* Set the size of the map */
+      #map {
+        height: 500px;
+        width: 100%;
+      }
+      /* Style for the search bar */
+      #search-input {
+        margin: 10px;
+        width: 300px;
+        height: 30px;
+        padding: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Search bar -->
+    <input id="search-input" type="text" placeholder="Search for places..." />
+
+    <!-- Map container -->
+    <div id="map"></div>
+
+    <script>
+      function initMap() {
+        // Create a map centered on a default location
+        const map = new google.maps.Map(document.getElementById("map"), {
+          center: { lat: -33.8688, lng: 151.2093 }, // Sydney, Australia
+          zoom: 13,
+        });
+
+        // Create the search box and link it to the UI element.
+        const input = document.getElementById("search-input");
+        const searchBox = new google.maps.places.SearchBox(input);
+
+        // Bias the SearchBox results towards current map's viewport.
+        map.addListener("bounds_changed", () => {
+          searchBox.setBounds(map.getBounds());
+        });
+
+        let markers = [];
+
+        // Listen for the event fired when the user selects a prediction and retrieve
+        // more details for that place.
+        searchBox.addListener("places_changed", () => {
+          const places = searchBox.getPlaces();
+
+          if (places.length == 0) {
+            return;
+          }
+
+          // Clear out the old markers.
+          markers.forEach((marker) => marker.setMap(null));
+          markers = [];
+
+          // For each place, get the icon, name, and location.
+          const bounds = new google.maps.LatLngBounds();
+          places.forEach((place) => {
+            if (!place.geometry || !place.geometry.location) {
+              console.log("Returned place contains no geometry");
+              return;
+            }
+
+            // Create a marker for each place.
+            const marker = new google.maps.Marker({
+              map,
+              title: place.name,
+              position: place.geometry.location,
+            });
+
+            markers.push(marker);
+
+            if (place.geometry.viewport) {
+              // Only geocodes have viewport.
+              bounds.union(place.geometry.viewport);
+            } else {
+              bounds.extend(place.geometry.location);
+            }
+          });
+          map.fitBounds(bounds);
+        });
+      }
+
+      // Initialize the map
+      window.onload = initMap;
+    </script>
+  </body>
+</html>

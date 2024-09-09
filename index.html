@@ -10,9 +10,17 @@
             <link rel="stylesheet" href="./style.css" />
       </head>
       <style>
-            /* index.css or App.css */
             ::-webkit-scrollbar {
                   display: none;
+            }
+            @font-face {
+                  font-family: "CustomFont";
+                  src: url("./src/fonts/Secondary.ttf") format("truetype");
+            }
+
+            .custom-font {
+                  font-family: "CustomFont", sans-serif;
+                  letter-spacing: 0.1em; /* Adjust this value as needed */
             }
 
             html,
